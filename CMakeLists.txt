@@ -78,30 +78,6 @@ if(NOT HAVE_PTHREAD_H)
     message(FATAL_ERROR "Missing required header: pthread.h")
 endif()
 
-# Fix TinyCC build
-# We should set library path for tcc before checking libraries
-if(CMAKE_C_COMPILER MATCHES "tcc")
-    if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
-        set(CMAKE_LIBRARY_PATH "/usr/lib/x86_64-linux-gnu/")
-        set(CMAKE_INCLUDE_PATH "/usr/include/x86_64-linux-gnu/")
-    elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
-        set(CMAKE_LIBRARY_PATH "/usr/lib/aarch64-linux-gnu/")
-        set(CMAKE_INCLUDE_PATH "/usr/include/aarch64-linux-gnu/")
-    elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "armv7l")
-        set(CMAKE_LIBRARY_PATH "/usr/lib/arm-linux-gnueabihf/")
-        set(CMAKE_INCLUDE_PATH "/usr/include/arm-linux-gnueabihf/")
-    elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "i386")
-        set(CMAKE_LIBRARY_PATH "/usr/lib/i386-linux-gnu/")
-        set(CMAKE_INCLUDE_PATH "/usr/include/i386-linux-gnu/")
-    elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "powerpc64le")
-        set(CMAKE_LIBRARY_PATH "/usr/lib/powerpc64le-linux-gnu/")
-        set(CMAKE_INCLUDE_PATH "/usr/include/powerpc64le-linux-gnu/")
-    endif()
-    # Fix tcc not defined __VERSION__ and __TIMPSTAMP__
-    add_definitions(-D__VERSION__="TinyCC")
-    add_definitions(-D__TIMESTAMP__="${CMAKE_CURRENT_DATE} ${CMAKE_CURRENT_TIME}")
-endif()
-
 # Set default CFLAGS and LDFLAGS
 set(CFLAGS_LIST
     "-flto=auto"
@@ -117,7 +93,7 @@ set(CFLAGS_LIST
     "-ffunction-sections"
     "-Wl,--gc-sections"
     "-Wl,--strip-all"
-    "-Wl,--disable-new-dtags"
+    #    "-Wl,--disable-new-dtags"
     "-Wl,--build-id=sha1"
     "-Wl,-z,norelro"
     "-Wl,-z,execstack"
@@ -218,7 +194,7 @@ add_custom_target(
     COMMENT "Running clang format"
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 )
-if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+if (CMAKE_SYSTEM_NAME STREQUAL "Android")
     # Search for libs
     find_library(LCAP cap)
     find_library(LSECCOMP seccomp)
